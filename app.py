@@ -77,13 +77,13 @@ with ui.accordion(id="acc", open="closed"):
     with ui.accordion_panel("Data Table"):
         @render.data_frame
         def penguin_datatable():
-            return render.DataTable(penguins_df)
+            return render.DataTable(filtered_data())
 
 # Display data grid
     with ui.accordion_panel("Data Grid"):
         @render.data_frame
         def penguin_datagrid():
-            return render.DataGrid(penguins_df)
+            return render.DataGrid(filtered_data())
 
 # Creates a Plotly Histogram showing all species
 
@@ -93,7 +93,7 @@ with ui.card(full_screen=True):
     @render_plotly
     def plotly_histogram():
         return px.histogram(
-            penguins_df, x=input.selected_attribute(), nbins=input.plotly_bin_count()
+            filtered_data(), x=input.selected_attribute(), nbins=input.plotly_bin_count()
         )
 
 # Creates a Seaborn Histogram showing all species
@@ -103,7 +103,7 @@ with ui.card(full_screen=True):
 
     @render.plot(alt="Seaborn Histogram")
     def seaborn_histogram():
-        histplot = sns.histplot(data=penguins_df, x="body_mass_g", bins=input.seaborn_bin_count())
+        histplot = sns.histplot(data=filtered_data(), x="body_mass_g", bins=input.seaborn_bin_count())
         histplot.set_title("Palmer Penguins")
         histplot.set_xlabel("Mass")
         histplot.set_ylabel("Count")
@@ -116,7 +116,7 @@ with ui.card(full_screen=True):
 
     @render_plotly
     def plotly_scatterplot():
-        return px.scatter(penguins_df,
+        return px.scatter(filtered_data(),
             x="bill_length_mm",
             y="body_mass_g",
             color="species",
@@ -141,4 +141,4 @@ ui.page_opts(title='Jaya Penguin Data', fillable=True)
 
 @reactive.calc
 def filtered_data():
-    return penguins_df
+    return penguins_df[penguins_df["species"].isin(input.selected_species_list())]
